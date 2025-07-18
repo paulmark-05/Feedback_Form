@@ -82,8 +82,8 @@ function generateEmailTemplate(data, forUser = false) {
         </div>
 
         <!-- Main Content -->
-        <div style="padding: 8px;">
-            <h2 style="color:rgb(48, 48, 172); margin: 0 0 10px 0; font-size: 18px;">Submission Details</h2>
+        <div style="padding: 8px;" class="center-text">
+            <h2 style="color:rgb(48, 48, 172); margin: 0 0 8px 0; font-size: 14px;">Submission Details</h2>
           </div>
 
           <!-- Details Table -->
