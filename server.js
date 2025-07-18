@@ -120,7 +120,10 @@ function generateOptimizedEmailTemplate(data, forUser = false) {
 // Input validation
 const validateSubmission = [
   body('name').trim().isLength({ min: 2, max: 100 }).escape(),
-  body('phone').trim().isMobilePhone('en-IN'),
+  body('phone')
+  .trim()
+  .matches(/^[6-9]\d{9}$/)
+  .withMessage('Phone number must be a valid 10-digit Indian mobile number starting with 6-9'),
   body('email').optional().isEmail().normalizeEmail(),
   body('rank').trim().isLength({ min: 2, max: 50 }).escape(),
   body('branch').trim().isIn(Object.keys(BRANCH_EMAILS)),
