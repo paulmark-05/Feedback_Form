@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "WB Sainik Board Feedback/Grievance System",
   "main": "server.js",
+  "license" : "MIT",
   "scripts": {
     "start": "node server.js"
   },
