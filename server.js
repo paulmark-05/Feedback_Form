@@ -58,6 +58,7 @@ function getBranchKey(branchValue) {
 // Enhanced email template with logo and professional styling
 function generateEmailTemplate(data, forUser = false) {
   const logoURL = 'https://feedback-form-b24b.onrender.com/logo.jpg' // Update with actual logo URL
+  const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   
   return `
     <!DOCTYPE html>
@@ -68,6 +69,7 @@ function generateEmailTemplate(data, forUser = false) {
       <title>WB Sainik Board - New Feedback Submission</title>
     </head>
     <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+      <!-- ID: ${uniqueId} -->
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
         
         <!-- Header with Logo -->
@@ -82,7 +84,7 @@ function generateEmailTemplate(data, forUser = false) {
         </div>
 
         <!-- Main Content -->
-        <div style="padding: 8px;" class="center-text">
+        <div style="padding: 8px; text-align: center;">
             <h2 style="color:rgb(48, 48, 172); margin: 0 0 8px 0; font-size: 14px;">Submission Details</h2>
           </div>
 
