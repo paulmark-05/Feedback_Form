@@ -72,8 +72,8 @@ function generateEmailTemplate(data, forUser = false) {
         
         <!-- Header with Logo -->
         <div style="background: linear-gradient(to bottom, rgb(224, 60, 60), rgb(48, 48, 172), rgb(39, 170, 214)); padding: 20px; text-align: center;">
-          <img src="${logoURL}" alt="WB Sainik Board Logo" style="max-height: 120px; margin-bottom: 10px;">
-          <h1 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: bold;">West Bengal Sainik Board</h1>
+          <img src="${logoURL}" alt="WB Sainik Board Logo" style="max-height: 100px; margin-bottom: 10px;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 19px; font-weight: bold;">West Bengal Sainik Board</h1>
        ${forUser ? `
           <p style="color: #e8f4f8; margin: 5px 0 0 0; font-size: 14px;">Thank you for your submission. Your information has been noted for suitable action. 
 </p>
@@ -82,7 +82,7 @@ function generateEmailTemplate(data, forUser = false) {
         </div>
 
         <!-- Main Content -->
-        <div style="padding: 15px;">
+        <div style="padding: 8px;">
             <h2 style="color:rgb(48, 48, 172); margin: 0 0 10px 0; font-size: 18px;">Submission Details</h2>
           </div>
 
@@ -117,7 +117,7 @@ function generateEmailTemplate(data, forUser = false) {
               <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.id || '-'}</td>
             </tr>
             <tr>
-              <td style="padding: 12px; font-weight: bold; color: #495057; background-color: #f8f9fa; vertical-align: top;">Feedback / Suggestion / Grievance </td>
+              <td style="padding: 12px; font-weight: bold; color: #495057; background-color: #f8f9fa; vertical-align: top;">Feedback / Grievance </td>
               <td style="padding: 12px; color: #212529;">${data.sugg || '-'}</td>
             </tr>
           </table>
