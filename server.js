@@ -57,9 +57,97 @@ function getBranchKey(branchValue) {
 
 // Enhanced email template with logo and professional styling
 function generateEmailTemplate(data, forUser = false) {
-  const logoURL = 'https://feedback-form-b24b.onrender.com/logo.jpg'
+  const logoURL = 'https://feedback-form-b24b.onrender.com/logo.jpg' // Update with actual logo URL
   
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>WB Sainik Board</title></head><body style="margin:0;padding:0;font-family:Arial,sans-serif;background:#f4f4f4"><div style="max-width:600px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.1)"><div style="background:linear-gradient(to bottom,#e03c3c,#3030ac,#27aadd);padding:20px;text-align:center"><img src="${logoURL}" alt="Logo" style="max-height:80px;margin-bottom:10px"><h1 style="color:#fff;margin:0;font-size:20px">West Bengal Sainik Board</h1><p style="color:#e8f4f8;margin:5px 0;font-size:14px">${forUser ? 'Thank you for your submission' : 'New Submission Received'}</p></div><div style="padding:20px"><h2 style="color:#3030ac;margin:0 0 15px;font-size:18px">Submission Details</h2><table style="width:100%;border-collapse:collapse;margin-bottom:20px;border:1px solid #dee2e6"><tr style="background:#f8f9fa"><td style="padding:10px;border-bottom:1px solid #dee2e6;font-weight:bold;width:30%">Rank</td><td style="padding:10px;border-bottom:1px solid #dee2e6">${data.rank}</td></tr><tr><td style="padding:10px;border-bottom:1px solid #dee2e6;font-weight:bold;background:#f8f9fa">Name</td><td style="padding:10px;border-bottom:1px solid #dee2e6">${data.name}</td></tr><tr><td style="padding:10px;border-bottom:1px solid #dee2e6;font-weight:bold;background:#f8f9fa">Relationship</td><td style="padding:10px;border-bottom:1px solid #dee2e6">${data.relationship}</td></tr><tr><td style="padding:10px;border-bottom:1px solid #dee2e6;font-weight:bold;background:#f8f9fa">Branch</td><td style="padding:10px;border-bottom:1px solid #dee2e6">${data.branch}</td></tr><tr><td style="padding:10px;border-bottom:1px solid #dee2e6;font-weight:bold;background:#f8f9fa">Phone</td><td style="padding:10px;border-bottom:1px solid #dee2e6">${data.phone}</td></tr><tr><td style="padding:10px;border-bottom:1px solid #dee2e6;font-weight:bold;background:#f8f9fa">Email</td><td style="padding:10px;border-bottom:1px solid #dee2e6">${data.email || '-'}</td></tr><tr><td style="padding:10px;border-bottom:1px solid #dee2e6;font-weight:bold;background:#f8f9fa">ID</td><td style="padding:10px;border-bottom:1px solid #dee2e6">${data.id || '-'}</td></tr><tr><td style="padding:10px;font-weight:bold;background:#f8f9fa;vertical-align:top">Feedback</td><td style="padding:10px">${data.sugg || '-'}</td></tr></table><div style="background:#e9ecef;padding:15px;border-radius:5px;margin-bottom:20px"><p style="margin:0;font-size:14px;color:#6c757d"><strong>Time:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>${data.attachmentCount > 0 ? `<p style="margin:10px 0 0;font-size:14px;color:#6c757d"><strong>Files:</strong> ${data.attachmentCount}</p>` : ''}</div></div>${forUser ? '<div style="background:#363c42;color:#fff;padding:20px;text-align:center"><p style="margin:0;font-size:14px">This is an automated notification from West Bengal Sainik Board.</p><p style="margin:10px 0 0;font-size:12px;color:#adb5bd">Do not reply to this mail. For further support please contact your ZSB branch.</p><hr style="border:none;border-top:1px solid #495057;margin:8px 0"><p style="margin:0;font-size:10px;color:#6c757d">Government of West Bengal | Serving Our Veterans and Families with Pride</p></div>' : ''}</div></body></html>`
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>WB Sainik Board - New Feedback Submission</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        
+        <!-- Header with Logo -->
+        <div style="background: linear-gradient(to bottom, rgb(224, 60, 60), rgb(48, 48, 172), rgb(39, 170, 214)); padding: 20px; text-align: center;">
+          <img src="${logoURL}" alt="WB Sainik Board Logo" style="max-height: 120px; margin-bottom: 10px;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: bold;">West Bengal Sainik Board</h1>
+       ${forUser ? `
+          <p style="color: #e8f4f8; margin: 5px 0 0 0; font-size: 14px;">Thank you for your submission. Your information has been noted for suitable action. 
+</p>
+          `:`
+          <p style="color: #e8f4f8; margin: 5px 0 0 0; font-size: 14px;">New Submission Received</p> `}
+        </div>
+
+        <!-- Main Content -->
+        <div style="padding: 15px;">
+            <h2 style="color:rgb(48, 48, 172); margin: 0 0 10px 0; font-size: 18px;">Submission Details</h2>
+          </div>
+
+          <!-- Details Table -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; border: 1px solid #dee2e6; border-radius: 5px; overflow: hidden;">
+            <tr style="background-color: #f8f9fa;">
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; width: 30%;">Rank</td>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.rank}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Serving / ESM Name</td>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.name}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Relationship</td>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.relationship}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Parent ZSB Branch</td>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.branch}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Phone No.</td>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.phone}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Email</td>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.email || '-'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">ZSB ID Card No.</td>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.id || '-'}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; font-weight: bold; color: #495057; background-color: #f8f9fa; vertical-align: top;">Feedback / Suggestion / Grievance </td>
+              <td style="padding: 12px; color: #212529;">${data.sugg || '-'}</td>
+            </tr>
+          </table>
+
+          <!-- Submission Info -->
+          <div style="background-color: #e9ecef; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <p style="margin: 0; font-size: 14px; color: #6c757d;">
+              <strong>Submission Time:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'medium' })}
+            </p>
+            ${data.attachmentCount > 0 ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #6c757d;"><strong>Attachments:</strong> ${data.attachmentCount} file(s) attached</p>` : ''}
+          </div>
+        </div>
+
+        <!-- Footer -->
+        ${forUser ? `
+        <div style="background-color:rgb(54, 60, 66); color: #ffffff; padding: 20px; text-align: center;">
+          <p style="margin: 0 0 10px 0; font-size: 14px;">This is an automated notification from West Bengal Sainik Board.</p>
+          <p style="margin: 0 0 10px 0; font-size: 12px; color: #adb5bd;">
+             Do not reply to this mail. For further support please contact your ZSB branch.
+          </p>
+          <hr style="border: none; border-top: 1px solid #495057; margin: 10px 0;">
+          <p style="margin: 0; font-size: 10px; color: #6c757d;">
+            Government of West Bengal | Serving Our Veterans and Families with Pride
+          </p>
+        </div>
+         `: ``}
+      </div>
+    </body>
+    </html>
+  `
 }
 
 
