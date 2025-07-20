@@ -1115,3 +1115,39 @@ html {
   .overlay-content { padding: 24px 10px; min-width: 130px; }
   .loader { width: 32px; height: 32px; }
 }
+
+/* 1. Always use border-box everywhere */
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+/* 2. Make sure field containers and direct field elements don't overflow */
+.input-group,
+input, select, textarea {
+  max-width: 100%;
+  box-sizing: border-box !important;
+}
+
+/* 3. The select and input fields will now shrink to fit their parents, even for long options */
+.form-row .input-group {
+  min-width: 0; /* allow shrinking below 250px if needed */
+}
+
+/* 4. Optional: For even tighter fit on tiny screens */
+@media (max-width: 480px) {
+  .form-container {
+    padding: 8px 2vw;
+  }
+  .input-group {
+    min-width: 0;
+    max-width: 100%;
+  }
+  input, select, textarea {
+    font-size: 16px;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+}
