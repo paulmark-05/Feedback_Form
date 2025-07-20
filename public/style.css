@@ -905,6 +905,81 @@ html {
 }
 
 
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .form-container {
+        width: 95%;
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    .input-group {
+        min-width: 100%;
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-row.main-info-row {
+        min-height: auto;
+    }
+
+    .input-group.stacked-fields {
+        margin-bottom: 15px;
+        flex: 1;
+        min-height: auto;
+    }
+
+    .input-group.relationship-column-simple {
+        max-width: none;
+        min-width: 100%;
+        margin-top: 15px;
+    }
+
+    .checkbox-group-simple {
+        flex-direction: row;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        height: auto;
+    }
+
+    .checkbox-label-simple {
+        flex: 1;
+        min-width: 80px;
+        justify-content: center;
+        text-align: center;
+        padding: 10px 5px;
+    }
+
+    .file-box {
+        width: 120px;
+    }
+
+    .file-thumb.full-image {
+        height: 90px;
+    }
+
+    .file-name {
+        font-size: 10px;
+        max-height: 2.2em;
+    }
+
+    .title {
+        font-size: 20px;
+    }
+
+    .logo {
+        width: 150px;
+    }
+
+    .guidelines-btn {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+}  
+
 @media (max-width: 767px){
   /* container padding a little tighter on small phones */
   .form-container{
@@ -997,20 +1072,46 @@ html {
   color: #333;
 }
 
-#submittingOverlay .loader {
-  border: 4px solid #ccc;
+#submittingOverlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 9999;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.5);
+}
+
+#submittingOverlay.active {
+  display: flex;
+}
+
+.overlay-content {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.3);
+  padding: 30px 40px;
+  text-align: center;
+  color: #333;
+  min-width: 220px;
+}
+
+.loader {
+  border: 4px solid #d3d3d3;
   border-top: 4px solid rgb(48, 48, 172);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 40px; height: 40px;
+  margin: 0 auto 18px;
   animation: spin 1s linear infinite;
-  margin: 0 auto 15px;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
-
+/* Mobile overlay optimization */
+@media (max-width: 600px) {
+  .overlay-content { padding: 24px 10px; min-width: 130px; }
+  .loader { width: 32px; height: 32px; }
+}
