@@ -3,8 +3,6 @@ let isSubmitting = false;
 let selectedFiles = [];
 let currentCompressFileIndex = -1;
 
-// Get the overlay element
-const overlay = document.getElementById('submittingOverlay');
 
 // Enhanced file size display function
 function formatFileSize(bytes) {
@@ -122,7 +120,7 @@ function setupPhoneValidation() {
     const phoneInput = document.getElementById('phone');
     const phoneError = document.getElementById('phone-error');
     
-    if (!phoneInput) return;
+    if (!phoneInput)return;
     
     phoneInput.addEventListener('input', function() {
         const phone = this.value.trim();
@@ -142,7 +140,8 @@ function setupPhoneValidation() {
         }
     });
 
-    // ✅ EMAIL VALIDATION BELOW
+
+// ✅ EMAIL VALIDATION BELOW
     const emailInput = document.getElementById('email');
     if (emailInput) {
         let emailError = document.getElementById('email-error');
@@ -179,7 +178,7 @@ function setupPhoneValidation() {
     }
 }
 
-// Custom Modal Functions (kept for file compression and error handling)
+// Custom Modal Functions
 function showModal(message, type = 'info', title = 'Notification') {
     const modal = document.getElementById('customModal');
     const container = modal.querySelector('.modal-container');
@@ -213,6 +212,7 @@ function closeModal() {
     currentCompressFileIndex = -1;
 }
 
+
 // Show compression confirmation dialog
 function showCompressionConfirmation(fileIndex) {
     const file = selectedFiles[fileIndex];
@@ -244,8 +244,9 @@ function showCompressionConfirmation(fileIndex) {
     
     footerElement.innerHTML = `
         <button class="modal-btn-secondary" onclick="closeModal()">No, close this message</button>
-        <button class="modal-btn-primary" onclick="proceedToCompression()">Yes, I want to compress</button>
-    `;
+<button class="modal-btn-primary" onclick="proceedToCompression()">Yes, I want to compress</button>
+    
+`;
     
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -254,8 +255,10 @@ function showCompressionConfirmation(fileIndex) {
     modalBody.scrollTop = 0;
 }
 
+
 // White-background compression services dialog
 function proceedToCompression() {
+    
     const file = selectedFiles[currentCompressFileIndex];
     if (!file) return;
 
@@ -294,8 +297,8 @@ function proceedToCompression() {
         `<button class="modal-btn-secondary" onclick="closeModal()">Close</button>`
     );
 }
+ window.proceedToCompression = proceedToCompression;
 
-window.proceedToCompression = proceedToCompression;
 
 // Update file input to match selectedFiles array
 function updateFileInput() {
@@ -316,13 +319,13 @@ function showFormHelp() {
         <div class="help-content">
             <h4>📋 Form Guidelines</h4>
             <ul style="text-align:left;margin:15px 0;">
-                <li><strong>Required:</strong> Rank, ESM Name, Relationship, Phone, Branch</li>
+                <li><strong>Required:</strong> Rank, ESM Name, Relationship, Phone, Parent ZSB Branch</li>
                 <li><strong>Files:</strong> ≤ 10 files, each ≤ 10 MB</li>
                 <li><strong>Formats:</strong> JPG / PNG images, PDF & DOC/DOCX docs</li>
                 <li><strong>Phone:</strong> Valid 10-digit Indian mobile number</li>
             </ul>
 
-            <h4>🔧 File Management</h4>
+            <h4>🔧 File Management (for attachments) </h4>
             <ul style="text-align:left;margin:15px 0;">
                 <li>Click the <b>×</b> to remove a file</li>
                 <li>Files over 10 MB show an orange border</li>
@@ -331,7 +334,7 @@ function showFormHelp() {
 
             <h4>📞 Need Help?</h4>
             <p style="text-align:left;margin:10px 0;">
-                Contact your local ZSB branch office.
+                Contact your Parent ZSB branch office.
             </p>
         </div>
     `;
@@ -351,26 +354,6 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeModal();
     }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.querySelector('form');
-  const overlay = document.getElementById('submittingOverlay');
-
-  if (form && overlay) {
-    form.addEventListener('submit', function() {
-      // Show overlay
-      overlay.classList.add('active');
-      // Optionally disable scrolling on mobile
-      document.body.style.overflow = "hidden";
-    });
-
-    // Optional: Hide on error/success
-    form.addEventListener('reset', function() {
-      overlay.classList.remove('active');
-      document.body.style.overflow = "";
-    });
-  }
 });
 
 // Main initialization
@@ -531,12 +514,14 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("upload-count").textContent = countText;
     }
 
-    // Form submission with validation and overlay
+    // Form submission with validation
     form.addEventListener("submit", async function(e) {
         e.preventDefault();
         e.stopPropagation();
+        
 
         if (isSubmitting) {
+          
             return;
         }
 
@@ -603,9 +588,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 formData.append("upload", file);
             });
 
-            // Show submitting overlay
-            overlay.style.display = 'flex';
-
             const response = await fetch("/submit", {
                 method: "POST",
                 body: formData
@@ -618,85 +600,88 @@ document.addEventListener("DOMContentLoaded", function() {
             const result = await response.json();
 
             if (result.success || result.message) {
-                // Hide overlay
-                overlay.style.display = 'none';
+                showModal(
+                    `Your feedback has been successfully submitted!<br><br><strong>Name:</strong> ${form.esmName.value}<br><strong>Branch:</strong> ${form.branch.value}<br><br>Thank you for your valuable feedback.`,
+                    'success',
+                    'Form Submitted Successfully'
+                );
                 
-                // Reset form for next submission
-                form.reset();
-                selectedFiles = [];
-                renderPreviews();
-                validateConsent();
-                
-                // Optional: Show brief success message
-                alert('✓ Your feedback was received. Thank you!');
-                
+                setTimeout(() => {
+                    form.reset();
+                    selectedFiles = [];
+                    renderPreviews();
+                    validateConsent();
+                }, 2000);
             } else {
                 throw new Error(result.error || "Failed to submit form");
             }
 
         } catch (error) {
             console.error("Submission error:", error);
-            
-            // Hide overlay on error
-            overlay.style.display = 'none';
-            
-            // Show error message
             showModal(
                 `Form submission failed: <strong>${error.message}</strong><br><br>Please check your internet connection and try again. If the problem persists, contact technical support.`,
                 'error',
                 'Submission Failed'
             );
-            
         } finally {
             isSubmitting = false;
-            submitBtn.textContent = "SUBMIT";
             validateConsent();
-        }
-    });
-
-    // List the selectors for all required fields
-    const requiredSelectors = ['#rank', '#esmName', '#phone', '#branch'];
-
-    function highlightMissing() {
-        let missing = false;
-        requiredSelectors.forEach(sel => {
-            const el = document.querySelector(sel);
-            if (el && !el.value.trim()) {
-                el.classList.add('input-error');
-                missing = true;
-            } else if (el) {
-                el.classList.remove('input-error');
+            if (!submitBtn.disabled) {
+                submitBtn.textContent = "SUBMIT";
             }
-        });
-        // Relationship radio validation (add red to label if missing)
-        const relRadios = document.getElementsByName('relationship');
-        const relLabel = document.getElementById('relationshipLabel');
-        const relChecked = Array.from(relRadios).some(r => r.checked);
-        if (!relChecked) {
-            relLabel.classList.add('input-error');
-            missing = true;
-        } else {
-            relLabel.classList.remove('input-error');
         }
-        return missing;
+    });
+
+
+
+    // List the selectors for all required fields (update if your IDs differ)
+const requiredSelectors = ['#rank', '#esmName', '#phone', '#branch'];
+
+function highlightMissing() {
+  let missing = false;
+  requiredSelectors.forEach(sel => {
+    const el = document.querySelector(sel);
+    if (el && !el.value.trim()) {
+      el.classList.add('input-error');
+      missing = true;
+    } else if (el) {
+      el.classList.remove('input-error');
     }
+  });
+  // Relationship radio validation (add red to label if missing)
+  const relRadios = document.getElementsByName('relationship');
+  const relLabel = document.getElementById('relationshipLabel');
+  const relChecked = Array.from(relRadios).some(r => r.checked);
+  if (!relChecked) {
+    relLabel.classList.add('input-error');
+    missing = true;
+  } else {
+    relLabel.classList.remove('input-error');
+  }
+  return missing;
+}
 
-    // On blur of each required field
-    requiredSelectors.forEach(sel => {
-        const el = document.querySelector(sel);
-        if (el) {
-            el.addEventListener('blur', () => {
-                if (!el.value.trim()) el.classList.add('input-error');
-                else el.classList.remove('input-error');
-            });
-        }
+// On blur of each required field
+requiredSelectors.forEach(sel => {
+  const el = document.querySelector(sel);
+  if (el) {
+    el.addEventListener('blur', () => {
+      if (!el.value.trim()) el.classList.add('input-error');
+      else el.classList.remove('input-error');
     });
-
-    // On form submit, highlight and block submission if missing
-    form.addEventListener('submit', function(e) {
-        if (highlightMissing()) {
-            e.preventDefault();
-            // Form validation errors are already handled above
-        }
-    });
+  }
 });
+
+// On form submit, highlight and block submission if missing
+document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+  if (highlightMissing()) {
+    e.preventDefault();
+    // Optionally show a message/modal
+    // alert("Please fill all required fields.");
+  }
+});
+
+});
+
+
+
