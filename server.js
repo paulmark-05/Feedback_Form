@@ -21,7 +21,6 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024, files: 10 }
 })
 
-// ZSB Branch email mapping - Update these with actual branch emails
 const BRANCH_EMAILS = {
   'Rajya Sainik Board': 'paulamit001@gmail.com',
   'ZSB Burdwan': 'nayanipaul001@gmail.com',
@@ -58,7 +57,7 @@ function getBranchKey(branchValue) {
 // Enhanced email template with logo and professional styling
 function generateEmailTemplate(data, forUser = false) {
   const logoURL = 'https://feedback-form-b24b.onrender.com/logo.jpg' // Update with actual logo URL
-  const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  const uniqueId = ` ${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   
   return `
     <!DOCTYPE html>
@@ -78,9 +77,9 @@ function generateEmailTemplate(data, forUser = false) {
           <h1 style="color: #ffffff; margin: 0; font-size: 19px; font-weight: bold;">West Bengal Sainik Board</h1>
        ${forUser ? `
           <p style="color: #e8f4f8; margin: 5px 0 0 0; font-size: 14px;">Thank you for your submission. Your information has been noted for suitable action. 
-</p>
-          `:`
-          <p style="color: #e8f4f8; margin: 5px 0 0 0; font-size: 14px;">New Submission Received</p> `}
+</p>`
+          :
+         ` <p style="color: #e8f4f8; margin: 5px 0 0 0; font-size: 14px;">New Submission Received</p> `}
         </div>
 
         <!-- Main Content -->
@@ -129,7 +128,7 @@ function generateEmailTemplate(data, forUser = false) {
             <p style="margin: 0; font-size: 14px; color: #6c757d;">
               <strong>Submission Time:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'medium' })}
             </p>
-            ${data.attachmentCount > 0 ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #6c757d;"><strong>Attachments:</strong> ${data.attachmentCount} file(s) attached</p>` : ''}
+            ${data.attachmentCount > 0 ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #6c757d;"><strong>Attachments:</strong> ${data.attachmentCount} file(s) attached</p>` : ``}
           </div>
         </div>
 
@@ -180,17 +179,18 @@ async function sendMail(data, files = []) {
   }))
 
   // Get branch email
+  const rsbEmail = 'paulamit001@gmail.com'
   const branchKey = getBranchKey(data.branch)
   const branchEmail = BRANCH_EMAILS[branchKey]
-  const recipients = [process.env.NOTIFY_EMAIL] // Always include admin
+  const recipients = [rsbEmail] 
   
-  if (branchEmail) {
+  if (branchEmail ) {
     recipients.push(branchEmail)
   }
 
   // Send to admin and branch
   await transporter.sendMail({
-    from: `"WB Sainik Board System" <${process.env.NOTIFY_EMAIL}>`,
+    from: `"West Bengal Sainik Board" `,
     to: recipients,
     subject: subject,
     html: emailHTML,
@@ -201,8 +201,8 @@ async function sendMail(data, files = []) {
   if (data.email && data.email.includes('@')) {
     const userHTML = generateEmailTemplate(data,true)
     await transporter.sendMail({
-      from: `"WB Sainik Board" <${process.env.NOTIFY_EMAIL}>`,
-      to: data.email,
+      from: `"West Bengal Sainik Board" `,
+      to: `${data.email}`,
       subject: 'Thank you for your submission - West Bengal Sainik Board',
       html: userHTML,
       attachments: attachments // Include attachments in user email too
@@ -219,7 +219,7 @@ app.post('/submit', upload.array('upload', 10), async (req, res) => {
     return res.status(400).json({ success: false, error: 'Missing required fields' })
   }
 
-  if (isDuplicate(`${data.name}_${data.phone}`)) {
+  if (isDuplicate('${data.name}_${data.phone}')) {
     return res.status(429).json({ success: false, error: 'Please wait 30 seconds before resubmitting' })
   }
 
