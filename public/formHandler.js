@@ -3,6 +3,7 @@ let isSubmitting = false;
 let selectedFiles = [];
 let currentCompressFileIndex = -1;
 
+
 // Enhanced file size display function
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 KB';
@@ -119,7 +120,7 @@ function setupPhoneValidation() {
     const phoneInput = document.getElementById('phone');
     const phoneError = document.getElementById('phone-error');
     
-    if (!phoneInput) return;
+    if (!phoneInput)return;
     
     phoneInput.addEventListener('input', function() {
         const phone = this.value.trim();
@@ -139,7 +140,8 @@ function setupPhoneValidation() {
         }
     });
 
-    // ✅ EMAIL VALIDATION BELOW
+
+// ✅ EMAIL VALIDATION BELOW
     const emailInput = document.getElementById('email');
     if (emailInput) {
         let emailError = document.getElementById('email-error');
@@ -210,6 +212,7 @@ function closeModal() {
     currentCompressFileIndex = -1;
 }
 
+
 // Show compression confirmation dialog
 function showCompressionConfirmation(fileIndex) {
     const file = selectedFiles[fileIndex];
@@ -241,8 +244,9 @@ function showCompressionConfirmation(fileIndex) {
     
     footerElement.innerHTML = `
         <button class="modal-btn-secondary" onclick="closeModal()">No, close this message</button>
-        <button class="modal-btn-primary" onclick="proceedToCompression()">Yes, I want to compress</button>
-    `;
+<button class="modal-btn-primary" onclick="proceedToCompression()">Yes, I want to compress</button>
+    
+`;
     
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -251,8 +255,10 @@ function showCompressionConfirmation(fileIndex) {
     modalBody.scrollTop = 0;
 }
 
+
 // White-background compression services dialog
 function proceedToCompression() {
+    
     const file = selectedFiles[currentCompressFileIndex];
     if (!file) return;
 
@@ -291,7 +297,8 @@ function proceedToCompression() {
         `<button class="modal-btn-secondary" onclick="closeModal()">Close</button>`
     );
 }
-window.proceedToCompression = proceedToCompression;
+ window.proceedToCompression = proceedToCompression;
+
 
 // Update file input to match selectedFiles array
 function updateFileInput() {
@@ -349,22 +356,25 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// ✅ OVERLAY MANAGEMENT FUNCTIONS
-function showOverlay() {
-    const overlay = document.getElementById('submittingOverlay');
-    if (overlay) {
-        overlay.classList.add('active');
-        document.body.style.overflow = "hidden";
-    }
-}
+ document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  const overlay = document.getElementById('submittingOverlay');
 
-function hideOverlay() {
-    const overlay = document.getElementById('submittingOverlay');
-    if (overlay) {
-        overlay.classList.remove('active');
-        document.body.style.overflow = "";
-    }
-}
+  if (form && overlay) {
+    form.addEventListener('submit', function() {
+      // Show overlay
+      overlay.classList.add('active');
+      // Optionally disable scrolling on mobile
+      document.body.style.overflow = "hidden";
+    });
+
+    // Optional: Hide on error/success
+    form.addEventListener('reset', function() {
+      overlay.classList.remove('active');
+      document.body.style.overflow = "";
+    });
+  }
+});
 
 // Main initialization
 document.addEventListener("DOMContentLoaded", function() {
@@ -505,15 +515,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         updateFileCount();
     }
-
-    function updateFileCount() {
-        const validFiles = selectedFiles.filter(f => f.size <= 10 * 1024 * 1024).length;
-        const oversizedFiles = selectedFiles.filter(f => f.size > 10 * 1024 * 1024).length;
-        
-        let countText = "";
-        if (validFiles > 0 && oversizedFiles > 0) {
-            countText = `${validFiles} valid file(s),
-
 
     function updateFileCount() {
         const validFiles = selectedFiles.filter(f => f.size <= 10 * 1024 * 1024).length;
