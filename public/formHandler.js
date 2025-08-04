@@ -319,7 +319,7 @@ function showFormHelp() {
         <div class="help-content">
             <h4>📋 Form Guidelines</h4>
             <ul style="text-align:left;margin:15px 0;">
-                <li><strong>Required:</strong> Rank, ESM Name, Relationship, Phone, Parent ZSB Branch</li>
+                <li><strong>Required:</strong> Rank, Serving/ESM Name, Service No., Relationship, Phone, Parent ZSB Branch</li>
                 <li><strong>Files:</strong> ≤ 10 files, each ≤ 10 MB</li>
                 <li><strong>Formats:</strong> JPG / PNG images, PDF & DOC/DOCX docs</li>
                 <li><strong>Phone:</strong> Valid 10-digit Indian mobile number</li>
@@ -655,7 +655,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     // List the selectors for all required fields (update if your IDs differ)
-const requiredSelectors = ['#rank', '#esmName', '#phone', '#branch'];
+const requiredSelectors = ['#rank', '#esmName', '#service', '#phone', '#branch', '#suggestions'];
 
 function highlightMissing() {
   let missing = false;
