@@ -21,24 +21,7 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024, files: 10 }
 })
 
-const BRANCH_EMAILS = {
-  'Rajya Sainik Board': 'paulamit001@gmail.com',
-  'ZSB Burdwan': 'nayanipaul001@gmail.com',
-  'ZSB Coochbehar': 'nayanipaul.24@gmail.com',
-  'ZSB Dakshin Dinajpur': 'nayanipaul001@gmail.com',
-  'ZSB Darjeeling': 'nayanipaul.24@gmail.com',
-  'ZSB Howrah': 'nayanipaul001@gmail.com',
-  'ZSB Jalpaiguri': 'nayanipaul.24@gmail.com',
-  'ZSB Kalimpong': 'nayanipaul001@gmail.com',
-  'ZSB Kolkata': 'nayanipaul.24@gmail.com',
-  'ZSB Malda': 'nayanipaul001@gmail.com',
-  'ZSB Midnapore': 'nayanipaul.24@gmail.com',
-  'ZSB Murshidabad': 'nayanipaul001@gmail.com',
-  'ZSB Nadia': 'nayanipaul.24@gmail.com',
-  'ZSB North 24 Parganas': 'nayanipaul001@gmail.com',
-  'ZSB South 24 Parganas': 'nayanipaul.24@gmail.com'
-}
-
+const BRANCH_EMAILS = { 'Rajya Sainik Board': 'paulamit001@gmail.com', 'ZSB Burdwan': 'nayanipaul001@gmail.com', 'ZSB Coochbehar': 'nayanipaul.24@gmail.com', 'ZSB Dakshin Dinajpur': 'nayanipaul001@gmail.com', 'ZSB Darjeeling': 'nayanipaul.24@gmail.com', 'ZSB Howrah': 'nayanipaul001@gmail.com', 'ZSB Jalpaiguri': 'nayanipaul.24@gmail.com', 'ZSB Kalimpong': 'nayanipaul001@gmail.com', 'ZSB Kolkata': 'nayanipaul.24@gmail.com', 'ZSB Malda': 'nayanipaul001@gmail.com', 'ZSB Midnapore': 'nayanipaul.24@gmail.com', 'ZSB Murshidabad': 'nayanipaul001@gmail.com', 'ZSB Nadia': 'nayanipaul.24@gmail.com', 'ZSB North 24 Parganas': 'nayanipaul001@gmail.com', 'ZSB South 24 Parganas': 'nayanipaul.24@gmail.com' }
 // Prevent rapid re-submission
 const recent = new Map()
 function isDuplicate(key) {
@@ -50,6 +33,7 @@ function isDuplicate(key) {
 }
 
 // Helper to clean branch names for mapping
+
 function getBranchKey(branchValue) {
   return branchValue.split(' (')[0].trim()
 }
@@ -97,8 +81,8 @@ function generateEmailTemplate(data, forUser = false) {
               <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Serving / ESM Name</td>
               <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.name}</td>
             </tr>
-            <tr>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Service Number</td>
+              <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Service Number<td>
               <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.service}</td>
             </tr>
             <tr>
@@ -173,7 +157,7 @@ async function sendMail(data, files = []) {
   data.attachmentCount = files.length
 
   const emailHTML = generateEmailTemplate(data, false)
-  const subject = `New Feedback/Grievance: ${data.rank} ${data.name} (${data.service})- ${getBranchKey(data.branch)}`
+  const subject = `New Feedback/Grievance: ${data.rank} ${data.name} - ${getBranchKey(data.branch)}`
 
   // Prepare attachments
   const attachments = files.map(file => ({
@@ -183,7 +167,7 @@ async function sendMail(data, files = []) {
   }))
 
   // Get branch email
-  const rsbEmail = 'paulamit001@gmail.com'
+  const rsbEmail = 'rsb-wb@gov.in'
   const branchKey = getBranchKey(data.branch)
   const branchEmail = BRANCH_EMAILS[branchKey]
   const recipients = [rsbEmail] 
