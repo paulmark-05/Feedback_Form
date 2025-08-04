@@ -1,13 +1,12 @@
 require('dotenv').config()
-
-const express    = require('express')
-const multer     = require('multer')
-const cors       = require('cors')
+const express = require('express')
+const multer = require('multer')
+const cors = require('cors')
 const nodemailer = require('nodemailer')
-const fs         = require('fs')
-const path       = require('path')
+const fs = require('fs')
+const path = require('path')
 
-const app  = express()
+const app = express()
 const PORT = process.env.PORT || 3000
 
 app.use(cors())
@@ -17,229 +16,296 @@ app.use(express.urlencoded({ extended: true }))
 
 // Multer config: up to 10 files, each ≤10MB
 const upload = multer({
-  dest: 'uploads/',
-  limits: { fileSize: 10 * 1024 * 1024, files: 10 }
+    dest: 'uploads/',
+    limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
+        files: 10
+    }
 })
 
-const BRANCH_EMAILS = { 'Rajya Sainik Board': 'paulamit001@gmail.com', 'ZSB Burdwan': 'nayanipaul001@gmail.com', 'ZSB Coochbehar': 'nayanipaul.24@gmail.com', 'ZSB Dakshin Dinajpur': 'nayanipaul001@gmail.com', 'ZSB Darjeeling': 'nayanipaul.24@gmail.com', 'ZSB Howrah': 'nayanipaul001@gmail.com', 'ZSB Jalpaiguri': 'nayanipaul.24@gmail.com', 'ZSB Kalimpong': 'nayanipaul001@gmail.com', 'ZSB Kolkata': 'nayanipaul.24@gmail.com', 'ZSB Malda': 'nayanipaul001@gmail.com', 'ZSB Midnapore': 'nayanipaul.24@gmail.com', 'ZSB Murshidabad': 'nayanipaul001@gmail.com', 'ZSB Nadia': 'nayanipaul.24@gmail.com', 'ZSB North 24 Parganas': 'nayanipaul001@gmail.com', 'ZSB South 24 Parganas': 'nayanipaul.24@gmail.com' }
+const BRANCH_EMAILS = {
+    'Rajya Sainik Board': 'paulamit001@gmail.com',
+    'ZSB Burdwan': 'nayanipaul001@gmail.com',
+    'ZSB Coochbehar': 'nayanipaul.24@gmail.com',
+    'ZSB Dakshin Dinajpur': 'nayanipaul001@gmail.com',
+    'ZSB Darjeeling': 'nayanipaul.24@gmail.com',
+    'ZSB Howrah': 'nayanipaul001@gmail.com',
+    'ZSB Jalpaiguri': 'nayanipaul.24@gmail.com',
+    'ZSB Kalimpong': 'nayanipaul001@gmail.com',
+    'ZSB Kolkata': 'nayanipaul.24@gmail.com',
+    'ZSB Malda': 'nayanipaul001@gmail.com',
+    'ZSB Midnapore': 'nayanipaul.24@gmail.com',
+    'ZSB Murshidabad': 'nayanipaul001@gmail.com',
+    'ZSB Nadia': 'nayanipaul.24@gmail.com',
+    'ZSB North 24 Parganas': 'nayanipaul001@gmail.com',
+    'ZSB South 24 Parganas': 'nayanipaul.24@gmail.com'
+}
+
 // Prevent rapid re-submission
 const recent = new Map()
+
 function isDuplicate(key) {
-  const now = Date.now()
-  const last = recent.get(key)
-  if (last && now - last < 5000) return true
-  recent.set(key, now)
-  return false
+    const now = Date.now()
+    const last = recent.get(key)
+    if (last && now - last < 5000) return true
+    recent.set(key, now)
+    return false
 }
 
 // Helper to clean branch names for mapping
-
 function getBranchKey(branchValue) {
-  return branchValue.split(' (')[0].trim()
+    return branchValue.split(' (')[0].trim()
 }
 
 // Enhanced email template with logo and professional styling
 function generateEmailTemplate(data, forUser = false) {
-  const logoURL = 'https://feedback-form-b24b.onrender.com/logo.jpg' // Update with actual logo URL
-  const uniqueId = ` ${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-  
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>WB Sainik Board - New Feedback Submission</title>
-    </head>
-    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-      <!-- ID: ${uniqueId} -->
-      <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    const logoURL = 'https://feedback-form-b24b.onrender.com/logo.jpg'
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>West Bengal Sainik Board - Form Submission</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 30px; text-align: center; }
+        .logo { width: 80px; height: 80px; margin: 0 auto 15px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; }
+        .logo img { width: 60px; height: 60px; object-fit: contain; }
+        .header h1 { margin: 0; font-size: 24px; font-weight: bold; }
+        .header p { margin: 5px 0 0; opacity: 0.9; font-size: 14px; }
+        .content { padding: 30px; }
+        .form-section { margin-bottom: 25px; }
+        .form-section h3 { color: #1e3c72; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-bottom: 15px; font-size: 18px; }
+        .form-row { display: flex; margin-bottom: 12px; }
+        .form-label { font-weight: bold; color: #333; min-width: 150px; padding-right: 15px; }
+        .form-value { color: #666; flex: 1; word-wrap: break-word; }
+        .files-section { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 15px; }
+        .file-item { background: white; padding: 8px 12px; margin: 5px 0; border-radius: 3px; border-left: 3px solid #1e3c72; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #e0e0e0; }
+        .warning { background-color: #fff3cd; color: #856404; padding: 15px; border: 1px solid #ffeaa7; border-radius: 5px; margin-bottom: 20px; }
+        .unique-id { font-family: monospace; background: #e9ecef; padding: 5px 8px; border-radius: 3px; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <img src="${logoURL}" alt="WB Sainik Board Logo" onerror="this.style.display='none'"/>
+            </div>
+            <h1>West Bengal Sainik Board</h1>
+            <p>${forUser ? 'Thank you for your submission' : 'New Form Submission Received'}</p>
+        </div>
         
-        <!-- Header with Logo -->
-        <div style="background: linear-gradient(to bottom, rgb(224, 60, 60), rgb(48, 48, 172), rgb(39, 170, 214)); padding: 20px; text-align: center;">
-          <img src="${logoURL}" alt="WB Sainik Board Logo" style="max-height: 100px; margin-bottom: 10px;">
-          <h1 style="color: #ffffff; margin: 0; font-size: 19px; font-weight: bold;">West Bengal Sainik Board</h1>
-       ${forUser ? `
-          <p style="color: #e8f4f8; margin: 5px 0 0 0; font-size: 14px;">Thank you for your submission. Your information has been noted for suitable action. 
-</p>`
-          :
-         ` <p style="color: #e8f4f8; margin: 5px 0 0 0; font-size: 14px;">New Submission Received</p> `}
+        <div class="content">
+            ${forUser ? 
+                '<div class="warning"><strong>Confirmation:</strong> Your form has been submitted successfully. You will receive a response from the concerned branch office soon.</div>' :
+                '<div class="warning"><strong>Action Required:</strong> A new form submission has been received and requires your attention.</div>'
+            }
+            
+            <div class="form-section">
+                <h3>Personal Information</h3>
+                <div class="form-row">
+                    <div class="form-label">Name:</div>
+                    <div class="form-value">${data.name || 'Not provided'}</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Service Number:</div>
+                    <div class="form-value">${data.serviceNumber || data.service_number || 'Not provided'}</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Email:</div>
+                    <div class="form-value">${data.email || 'Not provided'}</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Phone:</div>
+                    <div class="form-value">${data.phone || 'Not provided'}</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Address:</div>
+                    <div class="form-value">${data.address || 'Not provided'}</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Branch:</div>
+                    <div class="form-value">${data.branch || 'Not provided'}</div>
+                </div>
+                <div class="form-row">
+                    <div class="form-label">Relationship:</div>
+                    <div class="form-value">${data.relationship || 'Not provided'}</div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Message/Request</h3>
+                <div class="form-value" style="background: #f8f9fa; padding: 15px; border-radius: 5px; white-space: pre-wrap;">${data.message || 'No message provided'}</div>
+            </div>
+            
+            ${data.files && data.files.length > 0 ? `
+            <div class="form-section">
+                <h3>Attached Files (${data.files.length})</h3>
+                <div class="files-section">
+                    ${data.files.map(file => `
+                        <div class="file-item">
+                            <strong>${file.originalname}</strong> 
+                            <span style="color: #666; font-size: 12px;">(${(file.size / 1024).toFixed(2)} KB)</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
         </div>
-
-        <!-- Main Content -->
-        <div style="padding: 8px; text-align: center;">
-            <h2 style="color:rgb(48, 48, 172); margin: 0 0 8px 0; font-size: 14px;">Submission Details</h2>
-          </div>
-
-          <!-- Details Table -->
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; border: 1px solid #dee2e6; border-radius: 5px; overflow: hidden;">
-            <tr style="background-color: #f8f9fa;">
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; width: 30%;">Rank</td>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.rank}</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Serving / ESM Name</td>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.name}</td>
-            </tr>
-              <tr>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Service Number<td>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.service}</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Relationship</td>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.relationship}</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Parent ZSB Branch</td>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.branch}</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Phone No.</td>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.phone}</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Email</td>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.email || '-'}</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">ZSB ID Card No.</td>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.id || '-'}</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px; font-weight: bold; color: #495057; background-color: #f8f9fa; vertical-align: top;">Feedback / Grievance </td>
-              <td style="padding: 12px; color: #212529;">${data.sugg || '-'}</td>
-            </tr>
-          </table>
-
-          <!-- Submission Info -->
-          <div style="background-color: #e9ecef; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-            <p style="margin: 0; font-size: 14px; color: #6c757d;">
-              <strong>Submission Time:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'medium' })}
-            </p>
-            ${data.attachmentCount > 0 ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #6c757d;"><strong>Attachments:</strong> ${data.attachmentCount} file(s) attached</p>` : ``}
-          </div>
+        
+        <div class="footer">
+            <p><strong>Submission ID:</strong> <span class="unique-id">${uniqueId}</span></p>
+            <p><strong>Submitted on:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
+            <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
+            <p><em>This is an automated notification from West Bengal Sainik Board.</em></p>
+            <p><em>Do not reply to this mail. For further support please contact your ZSB branch.</em></p>
+            <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
+            <p><strong>Government of West Bengal | Serving Our Veterans and Families with Pride</strong></p>
         </div>
-
-        <!-- Footer -->
-        ${forUser ? `
-        <div style="background-color:rgb(54, 60, 66); color: #ffffff; padding: 20px; text-align: center;">
-          <p style="margin: 0 0 10px 0; font-size: 14px;">This is an automated notification from West Bengal Sainik Board.</p>
-          <p style="margin: 0 0 10px 0; font-size: 12px; color: #adb5bd;">
-             Do not reply to this mail. For further support please contact your ZSB branch.
-          </p>
-          <hr style="border: none; border-top: 1px solid #495057; margin: 10px 0;">
-          <p style="margin: 0; font-size: 12px; color: #6c757d;">
-            Government of West Bengal | Serving Our Veterans and Families with Pride
-          </p>
-        </div>
-         `: ``}
-      </div>
-    </body>
-    </html>
-  `
+    </div>
+</body>
+</html>
+    `
 }
 
-
-// Enhanced email function with branch-specific routing and attachments
-async function sendMail(data, files = []) {
-  if (!process.env.NOTIFY_EMAIL || !process.env.APP_PASSWORD) {
-    throw new Error('Email environment variables NOTIFY_EMAIL or APP_PASSWORD not set')
-  }
-
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: process.env.NOTIFY_EMAIL, pass: process.env.APP_PASSWORD }
-  })
-
-  await transporter.verify()
-
-  // Add attachment count to data for email template
-  data.attachmentCount = files.length
-
-  const emailHTML = generateEmailTemplate(data, false)
-  const subject = `New Feedback/Grievance: ${data.rank} ${data.name} (${data.service})- ${getBranchKey(data.branch)}`
-
-  // Prepare attachments
-  const attachments = files.map(file => ({
-    filename: file.originalname,
-    path: file.path,
-    contentType: file.mimetype
-  }))
-
-  // Get branch email
-  const rsbEmail = 'rsb-wb@gov.in'
-  const branchKey = getBranchKey(data.branch)
-  const branchEmail = BRANCH_EMAILS[branchKey]
-  const recipients = [rsbEmail] 
-  
-  if (branchEmail ) {
-    recipients.push(branchEmail)
-  }
-
-  // Send to admin and branch
-  await transporter.sendMail({
-    from: `"West Bengal Sainik Board" `,
-    to: recipients,
-    subject: subject,
-    html: emailHTML,
-    attachments: attachments
-  })
-
-  // Send confirmation to user if email provided
-  if (data.email && data.email.includes('@')) {
-    const userHTML = generateEmailTemplate(data,true)
-    await transporter.sendMail({
-      from: `"West Bengal Sainik Board" `,
-      to: `${data.email}`,
-      subject: 'Thank you for your submission - West Bengal Sainik Board',
-      html: userHTML,
-      attachments: attachments // Include attachments in user email too
-    })
-  }
-}
-
-// Simplified submission endpoint (no Google Sheets/Drive)
-app.post('/submit', upload.array('upload', 10), async (req, res) => {
-  const data  = req.body
-  const files = req.files || []
-
-  if (!data.name || !data.phone || !data.rank || !data.service || !data.suggestions || !data.branch || !data.relationship) {
-    return res.status(400).json({ success: false, error: 'Missing required fields' })
-  }
-
-  if (isDuplicate('${data.name}_${data.phone}')) {
-    return res.status(429).json({ success: false, error: 'Please wait 30 seconds before resubmitting' })
-  }
-
-  try {
-    // Send emails with attachments
-    await sendMail(data, files)
-
-    // Clean up uploaded files after sending email
-    files.forEach(file => {
-      if (fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path)
-      }
-    })
-
-    return res.json({ success: true, message: 'Form submitted successfully and notifications sent' })
-  }
-  catch (err) {
-    console.error('Submission error:', err)
-    // Clean up files on error
-    files.forEach(file => {
-      if (fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path)
-      }
-    })
-    return res.status(500).json({ success: false, error: 'Server error. Please try again.' })
-  }
+// Create nodemailer transporter
+const transporter = nodemailer.createTransporter({
+    service: 'gmail', // or your SMTP service
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS // Use app password for Gmail
+    }
 })
 
+// MAIN FORM SUBMISSION ROUTE - This was missing!
+app.post('/submit-form', upload.array('files', 10), async (req, res) => {
+    try {
+        console.log('Form submission received:', req.body)
+        console.log('Files received:', req.files)
+        
+        // Extract form data with proper field name mapping
+        const formData = {
+            name: req.body.name,
+            serviceNumber: req.body.serviceNumber || req.body.service_number, // Handle both possible field names
+            email: req.body.email,
+            phone: req.body.phone,
+            address: req.body.address,
+            branch: req.body.branch,
+            relationship: req.body.relationship,
+            message: req.body.message,
+            files: req.files || []
+        }
+        
+        // Validate required fields
+        if (!formData.name || !formData.email || !formData.branch) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Missing required fields: name, email, and branch are required' 
+            })
+        }
+        
+        // Check for duplicate submission
+        const submissionKey = `${formData.email}-${formData.name}-${Date.now()}`
+        if (isDuplicate(submissionKey)) {
+            return res.status(429).json({ 
+                success: false, 
+                message: 'Please wait before submitting again' 
+            })
+        }
+        
+        // Get branch email
+        const branchKey = getBranchKey(formData.branch)
+        const branchEmail = BRANCH_EMAILS[branchKey]
+        
+        if (!branchEmail) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid branch selected' 
+            })
+        }
+        
+        // Create email subject with service number
+        const serviceNumberText = formData.serviceNumber ? ` - Service No: ${formData.serviceNumber}` : ''
+        const emailSubject = `New Form Submission from ${formData.name}${serviceNumberText}`
+        
+        // Generate email content
+        const branchEmailContent = generateEmailTemplate(formData, false)
+        const userEmailContent = generateEmailTemplate(formData, true)
+        
+        // Prepare attachments
+        const attachments = formData.files.map(file => ({
+            filename: file.originalname,
+            path: file.path,
+            contentType: file.mimetype
+        }))
+        
+        // Send email to branch
+        const branchMailOptions = {
+            from: process.env.EMAIL_USER,
+            to: branchEmail,
+            subject: emailSubject,
+            html: branchEmailContent,
+            attachments: attachments
+        }
+        
+        // Send email to user (confirmation)
+        const userMailOptions = {
+            from: process.env.EMAIL_USER,
+            to: formData.email,
+            subject: 'Form Submission Confirmation - West Bengal Sainik Board',
+            html: userEmailContent
+        }
+        
+        // Send both emails
+        await Promise.all([
+            transporter.sendMail(branchMailOptions),
+            transporter.sendMail(userMailOptions)
+        ])
+        
+        // Clean up uploaded files after email is sent
+        formData.files.forEach(file => {
+            fs.unlink(file.path, (err) => {
+                if (err) console.error('Error deleting file:', err)
+            })
+        })
+        
+        console.log('Form submitted successfully for:', formData.name)
+        
+        res.json({ 
+            success: true, 
+            message: 'Form submitted successfully! You will receive a confirmation email shortly.' 
+        })
+        
+    } catch (error) {
+        console.error('Form submission error:', error)
+        
+        // Clean up uploaded files on error
+        if (req.files) {
+            req.files.forEach(file => {
+                fs.unlink(file.path, (err) => {
+                    if (err) console.error('Error deleting file:', err)
+                })
+            })
+        }
+        
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error occurred. Please try again later.' 
+        })
+    }
+})
+
+// Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', time: new Date().toISOString() })
+    res.json({ status: 'OK', timestamp: new Date().toISOString() })
 })
 
+// Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+    console.log(`Server running on port ${PORT}`)
 })
