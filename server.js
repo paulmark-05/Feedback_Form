@@ -174,7 +174,7 @@ function generateEmailTemplate(data, forUser = false) {
 }
 
 // Create nodemailer transporter
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
     service: 'gmail', // or your SMTP service
     auth: {
         user: process.env.EMAIL_USER,
