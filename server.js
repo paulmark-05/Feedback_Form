@@ -203,7 +203,7 @@ app.post('/submit', upload.array('upload', 10), async (req, res) => {
   const data  = req.body
   const files = req.files || []
 
-  if (!data.name || !data.phone || !data.rank || !data.branch || !data.relationship) {
+  if (!data.name || !data.phone || !data.rank || !data.service || !data.suggestions || !data.branch || !data.relationship) {
     return res.status(400).json({ success: false, error: 'Missing required fields' })
   }
 
