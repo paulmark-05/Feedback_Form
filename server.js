@@ -157,7 +157,7 @@ async function sendMail(data, files = []) {
   data.attachmentCount = files.length
 
   const emailHTML = generateEmailTemplate(data, false)
-  const subject = `New Feedback/Grievance: ${data.rank} ${data.name} - ${getBranchKey(data.branch)}`
+  const subject = `New Feedback/Grievance: ${data.rank} ${data.name} (${data.service})- ${getBranchKey(data.branch)}`
 
   // Prepare attachments
   const attachments = files.map(file => ({
