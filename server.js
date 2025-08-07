@@ -98,10 +98,6 @@ function generateEmailTemplate(data, forUser = false) {
               <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.name}</td>
             </tr>
             <tr>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Serving / ESM Name</td>
-              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.service}</td>
-            </tr>
-            <tr>
               <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Relationship</td>
               <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.relationship}</td>
             </tr>
@@ -123,7 +119,7 @@ function generateEmailTemplate(data, forUser = false) {
             </tr>
             <tr>
               <td style="padding: 12px; font-weight: bold; color: #495057; background-color: #f8f9fa; vertical-align: top;">Feedback / Grievance </td>
-              <td style="padding: 12px; color: #212529;">${data.sugg || '-'}</td>
+              <td style="padding: 12px; color: #212529;">${data.suggestions}</td>
             </tr>
           </table>
 
@@ -173,7 +169,7 @@ async function sendMail(data, files = []) {
   data.attachmentCount = files.length
 
   const emailHTML = generateEmailTemplate(data, false)
-  const subject = `New Feedback/Grievance: ${data.rank} ${data.name} (${data.service})- ${getBranchKey(data.branch)}`
+  const subject = `New Feedback/Grievance: ${data.rank} ${data.name} (${data.servicenum}) - ${getBranchKey(data.branch)}`
 
   // Prepare attachments
   const attachments = files.map(file => ({
