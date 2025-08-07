@@ -22,23 +22,22 @@ const upload = multer({
 })
 
 const BRANCH_EMAILS = {
-  'Rajya Sainik Board': 'rsb-wb@gov.in',
-  'ZSB Burdwan': 'secy.zsb-burdwan@bangla.gov.in',
-  'ZSB Coochbehar': 'secyzsb-wb.cbr@coochbehar.gov.in',
-  'ZSB Dakshin Dinajpur': 'secy.zsbdd-wb@gov.in',
-  'ZSB Darjeeling': 'zsbd-wb@gov.in',
-  'ZSB Howrah': 'secy.zsb-howrah@bangla.gov.in',
-  'ZSB Jalpaiguri': 'zsb-jalpaiguri@bangla.gov.in',
-  'ZSB Kalimpong': 'zsb-kpg@bangla.gov.in',
-  'ZSB Kolkata': 'zsb-kolkata@bangla.gov.in',
-  'ZSB Malda': 'secy.zsb-malda@bangla.gov.in',
-  'ZSB Midnapore': 'secy.zsb-midnapore@bangla.gov.in',
-  'ZSB Murshidabad': 'zsb-murshidabad@bangla.gov.in',
-  'ZSB Nadia': 'zsb-nadiawb@bangla.gov.in',
-  'ZSB North 24 Parganas': 'zsb-barasat@nic.in',
-  'ZSB South 24 Parganas': 'secy.zsb-wb.s24pgs@nic.in'
+  'Rajya Sainik Board': 'paulamit001@gmail.com',
+  'ZSB Burdwan': 'nayanipaul001@gmail.com',
+  'ZSB Coochbehar': 'nayanipaul.24@gmail.com',
+  'ZSB Dakshin Dinajpur': 'nayanipaul001@gmail.com',
+  'ZSB Darjeeling': 'nayanipaul.24@gmail.com',
+  'ZSB Howrah': 'nayanipaul001@gmail.com',
+  'ZSB Jalpaiguri': 'nayanipaul.24@gmail.com',
+  'ZSB Kalimpong': 'nayanipaul001@gmail.com',
+  'ZSB Kolkata': 'nayanipaul.24@gmail.com',
+  'ZSB Malda': 'nayanipaul001@gmail.com',
+  'ZSB Midnapore': 'nayanipaul.24@gmail.com',
+  'ZSB Murshidabad': 'nayanipaul001@gmail.com',
+  'ZSB Nadia': 'nayanipaul.24@gmail.com',
+  'ZSB North 24 Parganas': 'nayanipaul001@gmail.com',
+  'ZSB South 24 Parganas': 'nayanipaul.24@gmail.com'
 }
-
 // Prevent rapid re-submission
 const recent = new Map()
 function isDuplicate(key) {
@@ -96,6 +95,10 @@ function generateEmailTemplate(data, forUser = false) {
             <tr>
               <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Serving / ESM Name</td>
               <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.name}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Serving / ESM Name</td>
+              <td style="padding: 12px; border-bottom: 1px solid #dee2e6; color: #212529;">${data.servicenum}</td>
             </tr>
             <tr>
               <td style="padding: 12px; border-bottom: 1px solid #dee2e6; font-weight: bold; color: #495057; background-color: #f8f9fa;">Relationship</td>
@@ -179,7 +182,7 @@ async function sendMail(data, files = []) {
   }))
 
   // Get branch email
-  const rsbEmail = 'rsb-wb@gov.in'
+  const rsbEmail = 'nayanipaul001@gmail.com'
   const branchKey = getBranchKey(data.branch)
   const branchEmail = BRANCH_EMAILS[branchKey]
   const recipients = [rsbEmail] 
