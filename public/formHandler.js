@@ -3,9 +3,11 @@ let isSubmitting = false;
 let selectedFiles = [];
 let currentCompressFileIndex = -1;
 
+
 // Enhanced file size display function
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 KB';
+    
     const k = 1024;
     if (bytes < k) {
         return bytes + ' bytes';
@@ -27,6 +29,7 @@ function isFullDisplayImage(file) {
 // Setup relationship toggle functionality
 function setupRelationshipToggle() {
     const relationshipRadios = document.querySelectorAll('input[name="relationship"]');
+    
     relationshipRadios.forEach(radio => {
         let isSelected = false;
         
@@ -87,6 +90,7 @@ function validateRelationshipField() {
     // No relationship selected - show error
     label.classList.add('required-error');
     section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
     return false;
 }
 
@@ -116,7 +120,7 @@ function setupPhoneValidation() {
     const phoneInput = document.getElementById('phone');
     const phoneError = document.getElementById('phone-error');
     
-    if (!phoneInput) return;
+    if (!phoneInput)return;
     
     phoneInput.addEventListener('input', function() {
         const phone = this.value.trim();
@@ -135,12 +139,13 @@ function setupPhoneValidation() {
             phoneError.style.display = 'none';
         }
     });
-    
-    // EMAIL VALIDATION
+
+
+// ✅ EMAIL VALIDATION BELOW
     const emailInput = document.getElementById('email');
     if (emailInput) {
         let emailError = document.getElementById('email-error');
-        
+
         // If the error span doesn't already exist, create it
         if (!emailError) {
             emailError = document.createElement('span');
@@ -150,17 +155,18 @@ function setupPhoneValidation() {
             emailError.style.color = 'red';
             emailInput.parentNode.appendChild(emailError);
         }
-        
+
         emailInput.addEventListener('input', function () {
             const email = this.value.trim();
-            
+
             if (email === '') {
                 emailError.textContent = '';
                 emailError.style.display = 'none';
                 return;
             }
-            
+
             const emailRegex = /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i;
+
             if (!emailRegex.test(email)) {
                 emailError.textContent = 'Please enter a valid email (e.g. example@domain.com)';
                 emailError.style.display = 'block';
@@ -181,13 +187,15 @@ function showModal(message, type = 'info', title = 'Notification') {
     const footerElement = modal.querySelector('.modal-footer');
     
     container.classList.remove('success', 'error', 'warning', 'info', 'confirm');
+    
     if (type) {
         container.classList.add(type);
     }
     
     titleElement.textContent = title;
     messageElement.innerHTML = message;
-    footerElement.innerHTML = '';
+    
+    footerElement.innerHTML = '<button class="modal-btn-primary" onclick="closeModal()">OK</button>';
     
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -200,251 +208,10 @@ function closeModal() {
     const modal = document.getElementById('customModal');
     modal.classList.remove('active');
     document.body.style.overflow = 'auto';
+    
     currentCompressFileIndex = -1;
 }
 
-// Hide loading overlay - NEW FUNCTION
-function hideLoadingOverlay() {
-    const overlay = document.querySelector('.loading-overlay');
-    const submitOverlay = document.querySelector('.submit-overlay');
-    
-    if (overlay) {
-        overlay.style.display = 'none';
-    }
-    if (submitOverlay) {
-        submitOverlay.style.display = 'none';
-    }
-    
-    // Reset submitting flag
-    isSubmitting = false;
-}
-
-// Show loading overlay - NEW FUNCTION
-function showLoadingOverlay() {
-    const overlay = document.querySelector('.loading-overlay');
-    const submitOverlay = document.querySelector('.submit-overlay');
-    
-    if (overlay) {
-        overlay.style.display = 'flex';
-    }
-    if (submitOverlay) {
-        submitOverlay.style.display = 'flex';
-    }
-}
-
-// Reset form function - NEW FUNCTION
-function resetForm() {
-    const form = document.getElementById('feedbackForm') || document.querySelector('form');
-    if (form) {
-        form.reset();
-        
-        // Clear any error messages
-        const errorElements = document.querySelectorAll('.error-message');
-        errorElements.forEach(error => {
-            error.style.display = 'none';
-            error.textContent = '';
-        });
-        
-        // Clear file selections
-        selectedFiles = [];
-        const fileDisplay = document.getElementById('selectedFiles');
-        if (fileDisplay) {
-            fileDisplay.innerHTML = '';
-        }
-        
-        // Reset relationship toggles
-        const relationshipRadios = document.querySelectorAll('input[name="relationship"]');
-        relationshipRadios.forEach(radio => {
-            radio.checked = false;
-            radio.parentElement.isSelected = false;
-        });
-        
-        // Reset submit button state
-        const submitBtn = document.getElementById('submitBtn');
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.classList.add('disabled');
-        }
-        
-        console.log('Form reset completed');
-    }
-}
-
-// MAIN FORM SUBMISSION HANDLER - This was missing!
-async function submitForm(event) {
-    if (event) {
-        event.preventDefault();
-    }
-    
-    // Prevent multiple submissions
-    if (isSubmitting) {
-        console.log('Form already being submitted...');
-        return;
-    }
-    
-    console.log('Starting form submission...');
-    isSubmitting = true;
-    
-    try {
-        // Show loading overlay
-        showLoadingOverlay();
-        
-        // Get form data
-        const form = document.getElementById('feedbackForm') || document.querySelector('form');
-        if (!form) {
-            throw new Error('Form not found');
-        }
-        
-        // Create FormData object
-        const formData = new FormData();
-        
-        // Add form fields - make sure field names match server expectations
-        const name = document.getElementById('name')?.value?.trim();
-        const serviceNumber = document.getElementById('serviceNumber')?.value?.trim() || 
-                           document.getElementById('service_number')?.value?.trim();
-        const email = document.getElementById('email')?.value?.trim();
-        const phone = document.getElementById('phone')?.value?.trim();
-        const address = document.getElementById('address')?.value?.trim();
-        const branch = document.getElementById('branch')?.value;
-        const message = document.getElementById('message')?.value?.trim();
-        
-        // Get selected relationship
-        let relationship = '';
-        const relationshipRadios = document.querySelectorAll('input[name="relationship"]');
-        for (const radio of relationshipRadios) {
-            if (radio.checked) {
-                relationship = radio.value;
-                break;
-            }
-        }
-        
-        // Validate required fields
-        if (!name || !email || !branch) {
-            throw new Error('Please fill in all required fields: Name, Email, and Branch');
-        }
-        
-        // Add data to FormData
-        formData.append('name', name);
-        if (serviceNumber) formData.append('serviceNumber', serviceNumber);
-        formData.append('email', email);
-        if (phone) formData.append('phone', phone);
-        if (address) formData.append('address', address);
-        formData.append('branch', branch);
-        if (relationship) formData.append('relationship', relationship);
-        if (message) formData.append('message', message);
-        
-        // Add files
-        const fileInput = document.getElementById('files');
-        if (fileInput && fileInput.files) {
-            for (let i = 0; i < fileInput.files.length; i++) {
-                formData.append('files', fileInput.files[i]);
-            }
-        }
-        
-        console.log('Sending form data...');
-        
-        // Submit form
-        const response = await fetch('/submit-form', {
-            method: 'POST',
-            body: formData
-            // Don't set Content-Type header - let browser set it for multipart/form-data
-        });
-        
-        const result = await response.json();
-        console.log('Server response:', result);
-        
-        // Hide loading overlay before showing modal
-        hideLoadingOverlay();
-        
-        if (result.success) {
-            // Show success modal
-            showModal(
-                `<div style="text-align: center;">
-                    <div style="color: #28a745; font-size: 48px; margin-bottom: 15px;">✓</div>
-                    <h3 style="color: #28a745; margin-bottom: 15px;">Form Submitted Successfully!</h3>
-                    <p>${result.message}</p>
-                    <p style="margin-top: 20px; font-size: 14px; color: #666;">
-                        You will receive a confirmation email shortly.
-                    </p>
-                </div>`,
-                'success',
-                'Success'
-            );
-            
-            // Reset form after successful submission
-            setTimeout(() => {
-                resetForm();
-            }, 1000);
-            
-        } else {
-            // Show error modal
-            showModal(
-                `<div style="text-align: center;">
-                    <div style="color: #dc3545; font-size: 48px; margin-bottom: 15px;">✗</div>
-                    <h3 style="color: #dc3545; margin-bottom: 15px;">Submission Failed</h3>
-                    <p>${result.message || 'Please try again later.'}</p>
-                </div>`,
-                'error',
-                'Error'
-            );
-        }
-        
-    } catch (error) {
-        console.error('Form submission error:', error);
-        
-        // Hide loading overlay
-        hideLoadingOverlay();
-        
-        // Show error modal
-        showModal(
-            `<div style="text-align: center;">
-                <div style="color: #dc3545; font-size: 48px; margin-bottom: 15px;">✗</div>
-                <h3 style="color: #dc3545; margin-bottom: 15px;">Submission Error</h3>
-                <p>${error.message || 'An unexpected error occurred. Please try again.'}</p>
-            </div>`,
-            'error',
-            'Error'
-        );
-        
-        // Reset form on error
-        setTimeout(() => {
-            resetForm();
-        }, 2000);
-    }
-}
-
-// Remove oversized file
-function removeOversizedFile() {
-    if (currentCompressFileIndex >= 0 && currentCompressFileIndex < selectedFiles.length) {
-        selectedFiles.splice(currentCompressFileIndex, 1);
-        updateFileDisplay();
-        closeModal();
-    }
-}
-
-// Update file display
-function updateFileDisplay() {
-    const fileDisplay = document.getElementById('selectedFiles');
-    if (!fileDisplay) return;
-    
-    if (selectedFiles.length === 0) {
-        fileDisplay.innerHTML = '';
-        return;
-    }
-    
-    fileDisplay.innerHTML = selectedFiles.map((file, index) => `
-        <div class="file-item">
-            <span>${file.name} (${formatFileSize(file.size)})</span>
-            <button type="button" onclick="removeFile(${index})">Remove</button>
-        </div>
-    `).join('');
-}
-
-// Remove file
-function removeFile(index) {
-    selectedFiles.splice(index, 1);
-    updateFileDisplay();
-}
 
 // Show compression confirmation dialog
 function showCompressionConfirmation(fileIndex) {
@@ -465,110 +232,476 @@ function showCompressionConfirmation(fileIndex) {
     titleElement.textContent = 'Compress File Confirmation';
     
     messageElement.innerHTML = `
-        <div style="text-align: left;">
-            <p><strong>File:</strong> ${file.name}</p>
-            <p><strong>Current Size:</strong> ${formatFileSize(file.size)}</p>
-            <p><strong>Size Limit:</strong> 10 MB</p>
-            <p>What would you like to do with this oversized file?</p>
+        <div class="confirmation-content">
+            <div class="file-info">
+                <p><strong>File:</strong> ${file.name}</p>
+                <p><strong>Current Size:</strong> ${formatFileSize(file.size)}</p>
+                <p><strong>Size Limit:</strong> 10 MB</p>
+            </div>
+            <p class="confirmation-question">What would you like to do with this oversized file?</p>
         </div>
     `;
     
     footerElement.innerHTML = `
-        <div style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="removeOversizedFile()" class="btn btn-danger" style="flex: 1;">Remove File</button>
-                <button onclick="closeModal()" class="btn btn-secondary" style="flex: 1;">Keep & Continue</button>
-            </div>
-            
-            <div style="border-top: 1px solid #ddd; padding-top: 15px;">
-                <h4 style="margin: 0 0 10px; color: #666; font-size: 14px;">💡 Compress <strong>${file.name}</strong> using one of these free online tools:</h4>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
-                    <a href="https://www.ilovepdf.com/compress_pdf" target="_blank" class="compress-link">📄 PDF • No registration • Multiple formats</a>
-                    <a href="https://smallpdf.com/compress-pdf" target="_blank" class="compress-link">🎯 PDF specialist • High quality</a>
-                    <a href="https://www.adobe.com/acrobat/online/compress-pdf.html" target="_blank" class="compress-link">⚡ Easy • Quick processing</a>
-                </div>
-                <p style="font-size: 12px; color: #666; margin: 10px 0 0; text-align: center;">
-                    💡 After compressing, download the new file and re-upload it here to replace the original.
-                </p>
-            </div>
-            
-            <div style="border-top: 1px solid #ddd; padding-top: 10px; text-align: center;">
-                <p style="font-size: 12px; color: #888; margin: 0;">
-                    Need help? Contact your Parent ZSB branch office.
-                </p>
-            </div>
-        </div>
-    `;
+        <button class="modal-btn-secondary" onclick="closeModal()">No, close this message</button>
+<button class="modal-btn-primary" onclick="proceedToCompression()">Yes, I want to compress</button>
+    
+`;
     
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+    
+    const modalBody = modal.querySelector('.modal-body');
+    modalBody.scrollTop = 0;
 }
 
-// Initialize everything when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Initializing form handlers...');
+
+// White-background compression services dialog
+function proceedToCompression() {
     
-    // Setup validations
-    setupRelationshipToggle();
-    setupPhoneValidation();
+    const file = selectedFiles[currentCompressFileIndex];
+    if (!file) return;
+
+    showModal(
+        `<div class="compression-modal white-bg">
+            <h4 class="compression-title">File Compression Services</h4>
+            <p class="compression-subtitle">
+                Compress <strong>${file.name}</strong> using one of these free online tools:
+            </p>
+            <div class="service-cards">
+                <div class="service-card">
+                    <button onclick="window.open('https://www.youcompress.com/','_blank')">
+                        YouCompress
+                    </button>
+                    <p>No registration • Multiple formats</p>
+                </div>
+                <div class="service-card recommended">
+                    <button onclick="window.open('https://www.ilovepdf.com/compress_pdf','_blank')">
+                        iLovePDF <span class="recommended-text">(Recommended)</span>
+                    </button>
+                    <p>PDF specialist • High quality</p>
+                </div>
+                <div class="service-card">
+                    <button onclick="window.open('https://smallpdf.com/compress-pdf','_blank')">
+                        SmallPDF
+                    </button>
+                    <p>Easy • Quick processing</p>
+                </div>
+            </div>
+            <p class="compression-instructions">
+                💡 After compressing, download the new file and re-upload it here to replace the original.
+            </p>
+        </div>`,
+        'info',
+        '',
+        `<button class="modal-btn-secondary" onclick="closeModal()">Close</button>`
+    );
+}
+ window.proceedToCompression = proceedToCompression;
+
+
+// Update file input to match selectedFiles array
+function updateFileInput() {
+    const uploadInput = document.getElementById('upload');
     
-    // Setup consent checkbox
-    const consentCheckbox = document.getElementById('consentCheckbox');
-    if (consentCheckbox) {
-        consentCheckbox.addEventListener('change', validateConsent);
-        validateConsent(); // Initial check
+    if (selectedFiles.length === 0) {
+        uploadInput.value = '';
+    } else {
+        const dt = new DataTransfer();
+        selectedFiles.forEach(file => dt.items.add(file));
+        uploadInput.files = dt.files;
     }
+}
+
+// Form Help Guidelines
+function showFormHelp() {
+    const helpContent = `
+        <div class="help-content">
+            <h4>📋 Form Guidelines</h4>
+            <ul style="text-align:left;margin:15px 0;">
+                <li><strong>Required:</strong> Rank, ESM Name, Service No., Relationship, Phone No., Parent ZSB Branch, Feedback/Suggestion/Grievance </li>
+                <li><strong>Files:</strong> ≤ 10 files, each ≤ 10 MB</li>
+                <li><strong>Formats:</strong> JPG / PNG images, PDF & DOC/DOCX docs</li>
+                <li><strong>Phone:</strong> Valid 10-digit Indian mobile number</li>
+            </ul>
+
+            <h4>🔧 File Management (for attachments) </h4>
+            <ul style="text-align:left;margin:15px 0;">
+                <li>Click the <b>×</b> to remove a file</li>
+                <li>Files over 10 MB show an orange border</li>
+                <li>Click an oversized file → <strong>Compress</strong> or <strong>Remove</strong></li>
+            </ul>
+
+            <h4>📞 Need Help?</h4>
+            <p style="text-align:left;margin:10px 0;">
+                Contact your Parent ZSB branch office.
+            </p>
+        </div>
+    `;
     
-    // Setup form submission
-    const form = document.getElementById('feedbackForm') || document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', submitForm);
-        console.log('Form submission handler attached');
+    showModal(helpContent, 'info', 'Form Help');
+}
+
+// Close modal when clicking overlay
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'customModal') {
+        closeModal();
     }
-    
-    // Setup submit button click handler as backup
-    const submitBtn = document.getElementById('submitBtn');
-    if (submitBtn) {
-        submitBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            submitForm();
-        });
-    }
-    
-    // Setup file input handler
-    const fileInput = document.getElementById('files');
-    if (fileInput) {
-        fileInput.addEventListener('change', function(e) {
-            selectedFiles = Array.from(e.target.files);
-            updateFileDisplay();
-        });
-    }
-    
-    // Setup modal close handlers
-    const modal = document.getElementById('customModal');
-    if (modal) {
-        // Close modal when clicking outside
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeModal();
-            }
-        });
-        
-        // Close button
-        const closeBtn = modal.querySelector('.modal-close');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', closeModal);
-        }
-    }
-    
-    console.log('Form initialization complete');
 });
 
-// Make functions globally available
-window.submitForm = submitForm;
-window.resetForm = resetForm;
-window.showModal = showModal;
-window.closeModal = closeModal;
-window.removeFile = removeFile;
-window.removeOversizedFile = removeOversizedFile;
-window.showCompressionConfirmation = showCompressionConfirmation;
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
+});
+
+ document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  const overlay = document.getElementById('submittingOverlay');
+
+  if (form && overlay) {
+    form.addEventListener('submit', function() {
+      // Show overlay
+      overlay.classList.add('active');
+      // Optionally disable scrolling on mobile
+      document.body.style.overflow = "hidden";
+    });
+
+    // Optional: Hide on error/success
+    form.addEventListener('reset', function() {
+      overlay.classList.remove('active');
+      document.body.style.overflow = "";
+    });
+  }
+});
+
+// Main initialization
+document.addEventListener("DOMContentLoaded", function() {
+    const uploadInput = document.getElementById("upload");
+    const previewContainer = document.getElementById("file-preview");
+    const form = document.getElementById("feedbackForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const consentCheckbox = document.getElementById("consentCheckbox");
+    
+    // Initialize submit button as disabled
+    submitBtn.disabled = true;
+    submitBtn.classList.add('disabled');
+
+    // Setup phone validation
+    setupPhoneValidation();
+
+    // Setup relationship toggle functionality
+    setupRelationshipToggle();
+
+    // Consent checkbox validation
+    if (consentCheckbox) {
+        consentCheckbox.addEventListener('change', validateConsent);
+    }
+
+    // File upload handling
+    uploadInput.addEventListener("change", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const newFiles = Array.from(this.files);
+        const existingNames = selectedFiles.map(file => file.name);
+        const uniqueFiles = newFiles.filter(file => !existingNames.includes(file.name));
+        
+        // Check file limits
+        if (selectedFiles.length + uniqueFiles.length > 10) {
+            const allowedCount = 10 - selectedFiles.length;
+            showModal(
+                `Maximum 10 files allowed. Only the first ${allowedCount} files will be added.`,
+                'warning',
+                'File Limit Reached'
+            );
+            uniqueFiles.splice(allowedCount);
+        }
+        
+        // Add ALL files (including oversized ones)
+        selectedFiles = [...selectedFiles, ...uniqueFiles];
+        
+        this.value = "";
+        renderPreviews();
+    });
+
+    function renderPreviews() {
+        previewContainer.innerHTML = "";
+        
+        // Check if there are any oversized files
+        const oversizedFiles = selectedFiles.filter(f => f.size > 10 * 1024 * 1024);
+        
+        // Show warning if there are oversized files
+        if (oversizedFiles.length > 0) {
+            const warningDiv = document.createElement("div");
+            warningDiv.className = "oversized-warning";
+            warningDiv.innerHTML = `
+                <div class="warning-content">
+                    <span class="warning-icon">⚠️</span>
+                    <span class="warning-text">
+                        ${oversizedFiles.length} file(s) exceed the 10MB limit. 
+                        Click on oversized files to compress them.
+                    </span>
+                </div>
+            `;
+            previewContainer.appendChild(warningDiv);
+        }
+        
+        selectedFiles.forEach((file, index) => {
+            const fileBox = document.createElement("div");
+            fileBox.className = "file-box";
+            
+            const isOversized = file.size > 10 * 1024 * 1024;
+            if (isOversized) {
+                fileBox.classList.add('file-oversized');
+            }
+
+            const removeBtn = document.createElement("span");
+            removeBtn.innerHTML = "×";
+            removeBtn.className = "remove-btn";
+            removeBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                selectedFiles.splice(index, 1);
+                updateFileInput();
+                renderPreviews();
+                updateFileCount();
+            };
+
+            fileBox.appendChild(removeBtn);
+
+            // Enhanced: Full image display for PNG, JPG, JPEG
+            if (isFullDisplayImage(file)) {
+                const img = document.createElement("img");
+                img.src = URL.createObjectURL(file);
+                img.className = "file-thumb full-image";
+                img.onload = () => URL.revokeObjectURL(img.src);
+                fileBox.appendChild(img);
+            } else if (file.type.startsWith("image/")) {
+                const img = document.createElement("img");
+                img.src = URL.createObjectURL(file);
+                img.className = "file-thumb";
+                img.onload = () => URL.revokeObjectURL(img.src);
+                fileBox.appendChild(img);
+            } else {
+                const icon = document.createElement("div");
+                icon.className = "file-icon";
+                icon.textContent = file.name.split(".").pop().toUpperCase();
+                fileBox.appendChild(icon);
+
+                const fileName = document.createElement("div");
+                fileName.className = "file-name";
+                fileName.textContent = file.name;
+                fileBox.appendChild(fileName);
+            }
+            
+            const sizeBadge = document.createElement("div");
+            sizeBadge.className = isOversized ? "file-size-badge oversized" : "file-size-badge";
+            sizeBadge.textContent = formatFileSize(file.size);
+            fileBox.appendChild(sizeBadge);
+
+            // Make oversized files clickable
+            if (isOversized) {
+                fileBox.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showCompressionConfirmation(index);
+                };
+            }
+
+            previewContainer.appendChild(fileBox);
+        });
+
+        updateFileCount();
+    }
+
+    function updateFileCount() {
+        const validFiles = selectedFiles.filter(f => f.size <= 10 * 1024 * 1024).length;
+        const oversizedFiles = selectedFiles.filter(f => f.size > 10 * 1024 * 1024).length;
+        
+        let countText = "";
+        if (validFiles > 0 && oversizedFiles > 0) {
+            countText = `${validFiles} valid file(s), ${oversizedFiles} oversized file(s)`;
+        } else if (validFiles > 0) {
+            countText = `${validFiles} file(s) selected`;
+        } else if (oversizedFiles > 0) {
+            countText = `${oversizedFiles} oversized file(s) - click to compress`;
+        } else {
+            countText = "No files selected";
+        }
+        
+        document.getElementById("upload-count").textContent = countText;
+    }
+
+    // Form submission with validation
+    form.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+
+        if (isSubmitting) {
+          
+            return;
+        }
+
+        // VALIDATE RELATIONSHIP FIRST
+        if (!validateRelationshipField()) {
+            showModal(
+                'Please select your relationship before submitting the form.',
+                'error',
+                'Relationship Required'
+            );
+            return;
+        }
+
+        // Check consent
+        if (!consentCheckbox || !consentCheckbox.checked) {
+            showModal(
+                'You must agree to submit your personal information before submitting the form.',
+                'error',
+                'Consent Required'
+            );
+            return;
+        }
+
+        // Validate phone number
+        const phoneInput = document.getElementById('phone');
+        if (!validatePhoneNumber(phoneInput.value)) {
+            showModal(
+                'Please enter a valid 10-digit Indian mobile number (starting with 6, 7, 8, or 9).',
+                'error',
+                'Invalid Phone Number'
+            );
+            phoneInput.focus();
+            return;
+        }
+
+        // Check for oversized files before submission
+        const oversizedFiles = selectedFiles.filter(f => f.size > 10 * 1024 * 1024);
+        if (oversizedFiles.length > 0) {
+            showModal(
+                `Cannot submit form with oversized files. Please compress the following files first:<br><br>${oversizedFiles.map(f => `<strong>${f.name}</strong> (${formatFileSize(f.size)})`).join('<br>')}`,
+                'error',
+                'Oversized Files Detected'
+            );
+            return;
+        }
+
+        const validFiles = selectedFiles.filter(f => f.size <= 10 * 1024 * 1024);
+
+        isSubmitting = true;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting...";
+
+        try {
+            const formData = new FormData();
+            
+            const formFields = new FormData(form);
+            for (let [key, value] of formFields.entries()) {
+                if (key !== 'upload') {
+                    formData.append(key, value);
+                }
+            }
+            
+            validFiles.forEach(file => {
+                formData.append("upload", file);
+            });
+
+            const response = await fetch("/submit", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.success || result.message) {
+                showModal(
+                    `Your feedback has been successfully submitted!<br><br><strong>Name:</strong> ${form.esmName.value}<br><strong>Branch:</strong> ${form.branch.value}<br><br>Thank you for your valuable feedback.`,
+                    'success',
+                    'Form Submitted Successfully'
+                );
+                
+                setTimeout(() => {
+                    form.reset();
+                    selectedFiles = [];
+                    renderPreviews();
+                    validateConsent();
+                }, 2000);
+            } else {
+                throw new Error(result.error || "Failed to submit form");
+            }
+
+        } catch (error) {
+            console.error("Submission error:", error);
+            showModal(
+                `Form submission failed: <strong>${error.message}</strong><br><br>Please check your internet connection and try again. If the problem persists, contact technical support.`,
+                'error',
+                'Submission Failed'
+            );
+        } finally {
+            isSubmitting = false;
+            validateConsent();
+            if (!submitBtn.disabled) {
+                submitBtn.textContent = "SUBMIT";
+            }
+        }
+    });
+
+
+
+    // List the selectors for all required fields (update if your IDs differ)
+const requiredSelectors = ['#rank', '#esmName','#servicenum','#suggestion', '#phone', '#branch'];
+
+function highlightMissing() {
+  let missing = false;
+  requiredSelectors.forEach(sel => {
+    const el = document.querySelector(sel);
+    if (el && !el.value.trim()) {
+      el.classList.add('input-error');
+      missing = true;
+    } else if (el) {
+      el.classList.remove('input-error');
+    }
+  });
+  // Relationship radio validation (add red to label if missing)
+  const relRadios = document.getElementsByName('relationship');
+  const relLabel = document.getElementById('relationshipLabel');
+  const relChecked = Array.from(relRadios).some(r => r.checked);
+  if (!relChecked) {
+    relLabel.classList.add('input-error');
+    missing = true;
+  } else {
+    relLabel.classList.remove('input-error');
+  }
+  return missing;
+}
+
+// On blur of each required field
+requiredSelectors.forEach(sel => {
+  const el = document.querySelector(sel);
+  if (el) {
+    el.addEventListener('blur', () => {
+      if (!el.value.trim()) el.classList.add('input-error');
+      else el.classList.remove('input-error');
+    });
+  }
+});
+
+// On form submit, highlight and block submission if missing
+document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+  if (highlightMissing()) {
+    e.preventDefault();
+    // Optionally show a message/modal
+    // alert("Please fill all required fields.");
+  }
+});
+
+});
+
+
+
